@@ -1,0 +1,55 @@
+function minimum_pages(arr, n, k) {
+    let allocated_value = -1;
+
+    // If there are fewer books than students, allocation is not possible
+    if (n < k) return allocated_value;
+
+    // Helper function to check if we can allocate books with a max page limit
+    function canAllocate(arr, n, k, maxPages) {
+        let studentsRequired = 1;
+        let currentPages = 0;
+
+        for (let i = 0; i < n; i++) {
+            // If a single book has more pages than maxPages, allocation is not possible
+            if (arr[i] > maxPages) return false;
+
+            // Accumulate pages for the current student
+            if (currentPages + arr[i] > maxPages) {
+                // Allocate to a new student if adding this book exceeds maxPages
+                studentsRequired++;
+                currentPages = arr[i];
+
+                // If we need more students than available, return false
+                if (studentsRequired > k) return false;
+            } else {
+                currentPages += arr[i];
+            }
+        }
+        return true;
+    }
+
+    // Initialize binary search bounds
+    let low = Math.max(...arr); // Minimum possible max allocation (largest single book)
+    let high = arr.reduce((sum, pages) => sum + pages, 0); // Sum of all pages
+
+    // Binary search for the optimal solution
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+
+        // Check if we can allocate books with maxPages = mid
+        if (canAllocate(arr, n, k, mid)) {
+            allocated_value = mid; // Update allocated_value with a smaller possible value
+            high = mid - 1; // Try for a better solution on the left side
+        } else {
+            low = mid + 1; // Increase the lower bound if mid is too small
+        }
+    }
+
+    return allocated_value;
+}
+
+// Example usage
+const n = 8;
+const arr = [11, 33, 15, 62, 22, 15, 31, 60];
+const k = 3;
+console.log(minimum_pages(arr, n, k)); // Output: 99
