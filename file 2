@@ -1,0 +1,36 @@
+function runways_required(arrival_time, departure_time, no_of_planes) {
+    var no_of_runways = 1; // Initially set to 1
+
+    // Convert departure times that are less than arrival times to the next day
+    for (let i = 0; i < no_of_planes; i++) {
+        if (departure_time[i] < arrival_time[i]) {
+            departure_time[i] += 2400; // Add 24 hours to account for next day
+        }
+    }
+
+    // Sort both arrival and departure times
+    arrival_time.sort((a, b) => a - b);
+    departure_time.sort((a, b) => a - b);
+
+    let arrival_index = 0;
+    let departure_index = 0;
+    let current_runways = 0;
+
+    // Traverse both arrays using two pointers
+    while (arrival_index < no_of_planes && departure_index < no_of_planes) {
+        // If a plane arrives before another plane departs
+        if (arrival_time[arrival_index] < departure_time[departure_index]) {
+            current_runways++; // Need a new runway
+            arrival_index++;
+            
+            // Update the maximum runways needed
+            no_of_runways = Math.max(no_of_runways, current_runways);
+        } else {
+            // A plane departs, free up a runway
+            current_runways--;
+            departure_index++;
+        }
+    }
+
+    return no_of_runways;
+}
